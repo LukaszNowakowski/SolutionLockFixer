@@ -12,7 +12,6 @@
         private static void Main(string[] args)
         {
             Console.WriteLine("Solution directory: ");
-            ////var solutionDirectory = Console.ReadLine();
             var solutionDirectory = @"C:\AzureDevOpsWorkspaces\Applications\Agdf\CommercialOffers_Integration";
             if (!Directory.Exists(solutionDirectory))
             {
@@ -47,8 +46,6 @@
 
             output.Add("libraries", librariesNode);
             var projectNode = new JObject();
-            ////projectNode.Add("frameworks", new JObject() { "net461", new object { } });
-            ////projectNode.Add("runtimes", new JObject(){ { "win", new JObject() { "#import", new string [0] }}},{ "win-anycpu", new JObject() { "#import", new string[0] }}));
             var outputPath = Path.Combine(solutionDirectory, "solution.lock.json");
             File.WriteAllText(outputPath, output.ToString());
             Console.ReadLine();
@@ -64,7 +61,6 @@
             var libs = projectFile["libraries"];
             return libs.Children()
                 .OfType<JProperty>();
-            ////.Where(p => p.Value["type"]?.ToString() == "package");
         }
     }
 }
