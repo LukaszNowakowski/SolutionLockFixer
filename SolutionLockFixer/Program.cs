@@ -12,7 +12,7 @@
         private static void Main(string[] args)
         {
             Console.WriteLine("Solution directory: ");
-            var solutionDirectory = @"C:\AzureDevOpsWorkspaces\Applications\Agdf\CommercialOffers_Integration";
+            var solutionDirectory = Console.ReadLine();
             if (!Directory.Exists(solutionDirectory))
             {
                 Console.WriteLine("Directory '{0}' doesn't exist", solutionDirectory);
