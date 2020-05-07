@@ -11,7 +11,7 @@
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine("Solution directory: ");
+            Console.Write("Solution directory: ");
             var solutionDirectory = Console.ReadLine();
             if (!Directory.Exists(solutionDirectory))
             {
@@ -48,6 +48,8 @@
             var projectNode = new JObject();
             var outputPath = Path.Combine(solutionDirectory, "solution.lock.json");
             File.WriteAllText(outputPath, output.ToString());
+            Console.WriteLine("Done. File generated to '{0}'", outputPath);
+            Console.WriteLine("Press ENTER to exit");
             Console.ReadLine();
         }
 
