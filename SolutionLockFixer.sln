@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1022
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionLockFixer", "SolutionLockFixer\SolutionLockFixer.csproj", "{912B685B-422E-47E6-AFCB-31D83E1F15BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{912B685B-422E-47E6-AFCB-31D83E1F15BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{912B685B-422E-47E6-AFCB-31D83E1F15BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{912B685B-422E-47E6-AFCB-31D83E1F15BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{912B685B-422E-47E6-AFCB-31D83E1F15BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7ECDE193-FE7F-4E27-8754-A89AB06C1E72}
+	EndGlobalSection
+EndGlobal
