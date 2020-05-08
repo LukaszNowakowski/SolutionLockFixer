@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.IO;
     using System.Linq;
 
@@ -20,12 +22,6 @@
             }
 
             var solutionLockFile = Path.Combine(solutionDirectory, "solution.lock.json");
-            if (!File.Exists(solutionLockFile))
-            {
-                Console.WriteLine("solution.lock.json doesn't exist");
-                return;
-            }
-
             var projectLockFiles = Directory.GetFiles(solutionDirectory, "project.lock.json", SearchOption.AllDirectories);
             if (projectLockFiles.Length == 0)
             {
@@ -33,24 +29,29 @@
                 return;
             }
 
-            var projectFiles = projectLockFiles.Select(ParseFile);
+            var projectFiles = projectLockFiles.Select(ParseFile).ToList();
+            var output = new JObject { { "locked", false }, { "version", 3 } };
+            var librariesNode = CreateLibrariesNode(projectFiles);
+            output.Add("libraries", librariesNode);
+            File.WriteAllText(solutionLockFile, output.ToString());
+            Console.WriteLine("Done. File generated to '{0}'", solutionLockFile);
+            Console.WriteLine("Press ENTER to exit");
+            Console.ReadLine();
+        }
+
+        private static JObject CreateLibrariesNode(IEnumerable<JObject> projectFiles)
+        {
+            var librariesNode = new JObject();
             var allDependencies = projectFiles.SelectMany(ExtractDependencies)
+                .Where(p => (p.Value["type"] as JValue)?.Value?.ToString() != "project")
                 .Distinct(new DependenciesEqualityComparer())
                 .OrderBy(t => t.Path);
-            var output = new JObject { { "locked", "false" }, { "version", "3" } };
-            var librariesNode = new JObject();
             foreach (var dependency in allDependencies)
             {
                 librariesNode.Add(dependency);
             }
 
-            output.Add("libraries", librariesNode);
-            var projectNode = new JObject();
-            var outputPath = Path.Combine(solutionDirectory, "solution.lock.json");
-            File.WriteAllText(outputPath, output.ToString());
-            Console.WriteLine("Done. File generated to '{0}'", outputPath);
-            Console.WriteLine("Press ENTER to exit");
-            Console.ReadLine();
+            return librariesNode;
         }
 
         private static JObject ParseFile(string fullPath)
