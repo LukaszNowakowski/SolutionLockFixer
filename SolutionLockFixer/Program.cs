@@ -58,8 +58,16 @@ namespace SolutionLockFixer
             }
 
             var solutionLockFile = Path.Combine(solutionDirectory, "solution.lock.json");
-            var projectLockFiles = Directory.GetFiles(solutionDirectory, "project.lock.json", SearchOption.AllDirectories);
-            if (projectLockFiles.Length == 0)
+
+            var slnFile = Directory.GetFiles(solutionDirectory, "*.sln").First();
+
+            var slnContent = File.ReadAllText(slnFile);
+            var csprojFiles = slnContent.Split('"').Where(text => text.Contains(".csproj")).ToList();
+            var projectDirectories = csprojFiles.Select(file => Path.Combine(solutionDirectory, Path.GetDirectoryName(file))).ToList();
+
+            var projectLockFiles = projectDirectories.SelectMany(projectDir => Directory.GetFiles(projectDir, "project.lock.json")).ToList();
+
+            if (projectLockFiles.Count == 0)
             {
                 WriteErrorMessage("No project.json files found");
 
