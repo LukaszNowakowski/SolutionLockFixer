@@ -10,37 +10,42 @@ namespace SolutionLockFixer
 
     internal static class Program
     {
-        private static List<string> listOfBranchPaths = new List<string>();
+        private static List<string> listOfSolutionsPaths = new List<string>();
 
         private static void Main(string[] args)
         {
-            var noOfBranches = Convert.ToInt32(ConfigurationManager.AppSettings["NoOfBranches"]);
-            SetupBranches(noOfBranches);
+            var noOfSolutions = Convert.ToInt32(ConfigurationManager.AppSettings["NoOfSolutions"]);
+            SetupSolutions(noOfSolutions);
 
             var isValidInput = false;
             var solutionDirectory = string.Empty;
 
             while (!isValidInput)
             {
-                DisplayConfiguredBranches(noOfBranches);
+                DisplayConfiguredSolutions(noOfSolutions);
                 solutionDirectory = Console.ReadLine();
+
+                if (solutionDirectory == string.Empty)
+                {
+                    solutionDirectory = "1";
+                }
 
                 if (IsInputValueAnExitCode(solutionDirectory))
                 {
                     break;
                 }
 
-                var isIntInput = int.TryParse(solutionDirectory, out var selectedConfiguredBranch);
+                var isIntInput = int.TryParse(solutionDirectory, out var selectedConfiguredSolution);
                 if (isIntInput)
                 {
-                    if (selectedConfiguredBranch <= 0 ||
-                        selectedConfiguredBranch > noOfBranches)
+                    if (selectedConfiguredSolution <= 0 ||
+                        selectedConfiguredSolution > noOfSolutions)
                     {
-                        WriteErrorMessage("Numeric input value '{0}' is outside the configured branch range", selectedConfiguredBranch);
+                        WriteErrorMessage("Numeric input value '{0}' is outside the configured solutions range", selectedConfiguredSolution);
                         continue;
                     }
 
-                    solutionDirectory = listOfBranchPaths[selectedConfiguredBranch - 1];
+                    solutionDirectory = listOfSolutionsPaths[selectedConfiguredSolution - 1];
                 }
 
                 if (!Directory.Exists(solutionDirectory))
@@ -58,8 +63,16 @@ namespace SolutionLockFixer
             }
 
             var solutionLockFile = Path.Combine(solutionDirectory, "solution.lock.json");
-            var projectLockFiles = Directory.GetFiles(solutionDirectory, "project.lock.json", SearchOption.AllDirectories);
-            if (projectLockFiles.Length == 0)
+
+            var slnFile = Directory.GetFiles(solutionDirectory, "*.sln").First();
+
+            var slnContent = File.ReadAllText(slnFile);
+            var csprojFiles = slnContent.Split('"').Where(text => text.Contains(".csproj")).ToList();
+            var projectDirectories = csprojFiles.Select(file => Path.Combine(solutionDirectory, Path.GetDirectoryName(file))).ToList();
+
+            var projectLockFiles = projectDirectories.SelectMany(projectDir => Directory.GetFiles(projectDir, "project.lock.json")).ToList();
+
+            if (projectLockFiles.Count == 0)
             {
                 WriteErrorMessage("No project.json files found");
 
@@ -92,27 +105,27 @@ namespace SolutionLockFixer
             Console.WriteLine("");
         }
 
-        private static void SetupBranches(int noOfBranches)
+        private static void SetupSolutions(int noOfSolutions)
         {
-            for (int i = 0; i < noOfBranches; i++)
+            for (int i = 0; i < noOfSolutions; i++)
             {
-                var pathSetting = ConfigurationManager.AppSettings["BranchPath_" + (i + 1)];
-                listOfBranchPaths.Add(pathSetting);
+                var pathSetting = ConfigurationManager.AppSettings["SolutionPath_" + (i + 1)];
+                listOfSolutionsPaths.Add(pathSetting);
             }
         }
 
-        private static void DisplayConfiguredBranches(int noOfBranches)
+        private static void DisplayConfiguredSolutions(int noOfSolutions)
         {
-            Console.WriteLine("Configured Branches: ");
+            Console.WriteLine("Configured Solutions: ");
             Console.WriteLine();
-            for (int i = 0; i < noOfBranches; i++)
+            for (int i = 0; i < noOfSolutions; i++)
             {
-                var pathSetting = listOfBranchPaths[i];
+                var pathSetting = listOfSolutionsPaths[i];
                 Console.WriteLine((i + 1) + ". " + pathSetting);
             }
 
             Console.WriteLine();
-            Console.Write("Solution directory ('x' to exit): ");
+            Console.Write("Solution directory ('1' by default, 'x' to exit): ");
         }
 
         private static bool IsInputValueAnExitCode(string input)
